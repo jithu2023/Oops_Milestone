@@ -18,11 +18,11 @@ public:
     MenuItem(string name, double price) : name(name), price(price) {}
 
     string getName() const {
-        return name;
+        return this->name;
     }
 
     double getPrice() const {
-        return price;
+        return this->price;
     }
 };
 
@@ -38,24 +38,24 @@ public:
     Order(int orderId) : orderId(orderId) {}
 
     void addItem(MenuItem item) {
-        items.push_back(item);
+        this->items.push_back(item);
     }
 
     double getTotal() const {
         double total = 0.0;
-        for (const auto& item : items) {
+        for (const auto& item : this->items) {
             total += item.getPrice();
         }
         return total;
     }
 
     void displayOrder() const {
-        cout << "Order ID: " << orderId << endl;
+        cout << "Order ID: " << this->orderId << endl;
         cout << "Items:" << endl;
-        for (const auto& item : items) {
+        for (const auto& item : this->items) {
             cout << "- " << item.getName() << " ($" << item.getPrice() << ")" << endl;
         }
-        cout << "Total: $" << getTotal() << endl;
+        cout << "Total: $" << this->getTotal() << endl;
     }
 };
 
@@ -69,19 +69,19 @@ public:
     Restaurant() : nextOrderId(1) {}
 
     void addMenuItem(int id, MenuItem item) {
-        menu[id] = item;
+        this->menu[id] = item;
     }
 
     void displayMenu() const {
         cout << "\n--- Steakhouse Menu ---" << endl;
-        for (const auto& item : menu) {
+        for (const auto& item : this->menu) {
             cout << item.first << ". " << item.second.getName() << " - $" << item.second.getPrice() << endl;
         }
         cout << "------------------------\n" << endl;
     }
 
     void takeOrder() {
-        int orderId = nextOrderId++;
+        int orderId = this->nextOrderId++;
         Order order(orderId);
         int itemId;
 
@@ -100,16 +100,16 @@ public:
 
             if (itemId == 0) break;
 
-            if (menu.find(itemId) != menu.end()) {
-                order.addItem(menu[itemId]);
-                cout << menu[itemId].getName() << " added to the order." << endl;
+            if (this->menu.find(itemId) != this->menu.end()) {
+                order.addItem(this->menu[itemId]);
+                cout << this->menu[itemId].getName() << " added to the order." << endl;
             } else {
                 cout << "Invalid item ID! Please try again." << endl;
             }
         }
 
         if (order.getTotal() > 0) {
-            orders[orderId] = order;
+            this->orders[orderId] = order;
             cout << "\nOrder placed successfully!\n" << endl;
         } else {
             cout << "\nNo items were added to the order.\n" << endl;
@@ -117,13 +117,13 @@ public:
     }
 
     void displayOrders() const {
-        if (orders.empty()) {
+        if (this->orders.empty()) {
             cout << "\nNo orders have been placed yet.\n" << endl;
             return;
         }
 
         cout << "\n--- All Orders ---" << endl;
-        for (const auto& order : orders) {
+        for (const auto& order : this->orders) {
             order.second.displayOrder();
             cout << "-----------------------" << endl;
         }
@@ -179,13 +179,3 @@ int main() {
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
-           
