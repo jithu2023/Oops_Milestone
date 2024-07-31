@@ -3,6 +3,7 @@
 #include <string>
 #include <map>
 #include <limits>
+#include <array>
 
 using namespace std;
 
@@ -135,11 +136,17 @@ int main() {
     Restaurant restaurant;
 
     // Add menu items (steak varieties)
-    restaurant.addMenuItem(1, MenuItem("Ribeye Steak", 25.99));
-    restaurant.addMenuItem(2, MenuItem("Filet Mignon", 29.99));
-    restaurant.addMenuItem(3, MenuItem("New York Strip", 22.99));
-    restaurant.addMenuItem(4, MenuItem("T-Bone Steak", 27.99));
-    restaurant.addMenuItem(5, MenuItem("Sirloin Steak", 19.99));
+    array<MenuItem, 5> menuItems = {
+        MenuItem("Ribeye Steak", 25.99),
+        MenuItem("Filet Mignon", 29.99),
+        MenuItem("New York Strip", 22.99),
+        MenuItem("T-Bone Steak", 27.99),
+        MenuItem("Sirloin Steak", 19.99)
+    };
+
+    for (size_t i = 0; i < menuItems.size(); ++i) {
+        restaurant.addMenuItem(i + 1, menuItems[i]);
+    }
 
     int choice;
 
