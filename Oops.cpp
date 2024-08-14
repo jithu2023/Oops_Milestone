@@ -16,11 +16,11 @@ public:
     MenuItem(string name, double price) : name(name), price(price) {}
 
     string getName() const {
-        return name;
+        return this->name;
     }
 
     double getPrice() const {
-        return price;
+        return this->price;
     }
 };
 
@@ -53,12 +53,12 @@ public:
     }
 
     void displayOrder() const {
-        cout << "Order ID: " << orderId << endl;
+        cout << "Order ID: " << this->orderId << endl;
         cout << "Items:" << endl;
         for (const auto& item : items) {
             cout << "- " << item->getName() << " ($" << item->getPrice() << ")" << endl;
         }
-        cout << "Total: $" << getTotal() << endl;
+        cout << "Total: $" << this->getTotal() << endl;
     }
 };
 
