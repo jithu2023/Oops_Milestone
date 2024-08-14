@@ -3,7 +3,6 @@
 #include <string>
 #include <map>
 #include <limits>
-#include <array>
 
 using namespace std;
 
@@ -13,9 +12,7 @@ private:
     string name;
     double price;
 public:
-    // Default constructor
-    MenuItem() : name(""), price(0.0) {}
-
+    // Constructor
     MenuItem(string name, double price) : name(name), price(price) {}
 
     string getName() const {
@@ -31,21 +28,26 @@ public:
 class Order {
 private:
     int orderId;
-    vector<MenuItem> items;
+    vector<MenuItem*> items;
 public:
-    // Default constructor
-    Order() : orderId(0) {}
-
+    // Constructor
     Order(int orderId) : orderId(orderId) {}
+    
+    // Destructor to free dynamically allocated memory
+    ~Order() {
+        for (auto item : items) {
+            delete item;
+        }
+    }
 
-    void addItem(MenuItem item) {
+    void addItem(MenuItem* item) {
         items.push_back(item);
     }
 
     double getTotal() const {
         double total = 0.0;
         for (const auto& item : items) {
-            total += item.getPrice();
+            total += item->getPrice();
         }
         return total;
     }
@@ -54,7 +56,7 @@ public:
         cout << "Order ID: " << orderId << endl;
         cout << "Items:" << endl;
         for (const auto& item : items) {
-            cout << "- " << item.getName() << " ($" << item.getPrice() << ")" << endl;
+            cout << "- " << item->getName() << " ($" << item->getPrice() << ")" << endl;
         }
         cout << "Total: $" << getTotal() << endl;
     }
@@ -63,30 +65,42 @@ public:
 // Restaurant Class
 class Restaurant {
 private:
-    map<int, MenuItem> menu;
-    map<int, Order> orders;
+    map<int, MenuItem*> menu;
+    map<int, Order*> orders;
     int nextOrderId;
 public:
+    // Constructor
     Restaurant() : nextOrderId(1) {}
 
-    void addMenuItem(int id, MenuItem item) {
+    // Destructor to free dynamically allocated memory
+    ~Restaurant() {
+        for (auto& item : menu) {
+            delete item.second;
+        }
+
+        for (auto& order : orders) {
+            delete order.second;
+        }
+    }
+
+    void addMenuItem(int id, MenuItem* item) {
         menu[id] = item;
     }
 
     void displayMenu() const {
         cout << "\n--- Steakhouse Menu ---" << endl;
         for (const auto& item : menu) {
-            cout << item.first << ". " << item.second.getName() << " - $" << item.second.getPrice() << endl;
+            cout << item.first << ". " << item.second->getName() << " - $" << item.second->getPrice() << endl;
         }
         cout << "------------------------\n" << endl;
     }
 
     void takeOrder() {
         int orderId = nextOrderId++;
-        Order order(orderId);
+        Order* order = new Order(orderId);
         int itemId;
-
         cout << "\nEnter item IDs to add to order (0 to finish):" << endl;
+
         while (true) {
             cout << "Item ID: ";
             cin >> itemId;
@@ -102,17 +116,18 @@ public:
             if (itemId == 0) break;
 
             if (menu.find(itemId) != menu.end()) {
-                order.addItem(menu[itemId]);
-                cout << menu[itemId].getName() << " added to the order." << endl;
+                order->addItem(menu[itemId]);
+                cout << menu[itemId]->getName() << " added to the order." << endl;
             } else {
                 cout << "Invalid item ID! Please try again." << endl;
             }
         }
 
-        if (order.getTotal() > 0) {
+        if (order->getTotal() > 0) {
             orders[orderId] = order;
             cout << "\nOrder placed successfully!\n" << endl;
         } else {
+            delete order; // Avoid memory leak by deleting the order if it's empty
             cout << "\nNo items were added to the order.\n" << endl;
         }
     }
@@ -125,10 +140,9 @@ public:
 
         cout << "\n--- All Orders ---" << endl;
         for (const auto& order : orders) {
-            order.second.displayOrder();
+            order.second->displayOrder();
             cout << "-----------------------" << endl;
         }
-        cout << "------------------------\n" << endl;
     }
 };
 
@@ -136,17 +150,11 @@ int main() {
     Restaurant restaurant;
 
     // Add menu items (steak varieties)
-    array<MenuItem, 5> menuItems = {
-        MenuItem("Ribeye Steak", 25.99),
-        MenuItem("Filet Mignon", 29.99),
-        MenuItem("New York Strip", 22.99),
-        MenuItem("T-Bone Steak", 27.99),
-        MenuItem("Sirloin Steak", 19.99)
-    };
-
-    for (size_t i = 0; i < menuItems.size(); ++i) {
-        restaurant.addMenuItem(i + 1, menuItems[i]);
-    }
+    restaurant.addMenuItem(1, new MenuItem("Ribeye Steak", 25.99));
+    restaurant.addMenuItem(2, new MenuItem("Filet Mignon", 29.99));
+    restaurant.addMenuItem(3, new MenuItem("New York Strip", 22.99));
+    restaurant.addMenuItem(4, new MenuItem("T-Bone Steak", 27.99));
+    restaurant.addMenuItem(5, new MenuItem("Sirloin Steak", 19.99));
 
     int choice;
 
@@ -177,10 +185,8 @@ int main() {
                 restaurant.displayOrders();
                 break;
             case 4:
-                cout << "Exiting program. Thank you!" << endl;
-                exit(0);
-            default:
-                cout << "Invalid choice! Please try again." << endl;
+                cout << "Exiting the program. Goodbye!" << endl;
+                return 0;
         }
     }
 
