@@ -6,33 +6,37 @@
 
 using namespace std;
 
-// Menu Item Class
+// MenuItem Class to represent an item on the menu
 class MenuItem {
 private:
-    string name;
-    double price;
+    string name;   // Name of the menu item
+    double price;  // Price of the menu item
+
 public:
-    // Constructor
+    // Constructor to initialize MenuItem with name and price
     MenuItem(string name, double price) : name(name), price(price) {}
 
+    // Getter for item name
     string getName() const {
         return this->name;
     }
 
+    // Getter for item price
     double getPrice() const {
         return this->price;
     }
 };
 
-// Order Class
+// Order Class to represent a customer order
 class Order {
 private:
-    int orderId;
-    vector<MenuItem*> items;
+    int orderId;                  // Unique identifier for the order
+    vector<MenuItem*> items;      // List of items in the order
+
 public:
-    // Constructor
+    // Constructor to initialize Order with an ID
     Order(int orderId) : orderId(orderId) {}
-    
+
     // Destructor to free dynamically allocated memory
     ~Order() {
         for (auto item : items) {
@@ -40,10 +44,12 @@ public:
         }
     }
 
+    // Add a MenuItem to the order
     void addItem(MenuItem* item) {
         items.push_back(item);
     }
 
+    // Calculate the total price of the order
     double getTotal() const {
         double total = 0.0;
         for (const auto& item : items) {
@@ -52,6 +58,7 @@ public:
         return total;
     }
 
+    // Display the order details
     void displayOrder() const {
         cout << "Order ID: " << this->orderId << endl;
         cout << "Items:" << endl;
@@ -62,14 +69,15 @@ public:
     }
 };
 
-// Restaurant Class
+// Restaurant Class to manage menu items and orders
 class Restaurant {
 private:
-    map<int, MenuItem*> menu;
-    map<int, Order*> orders;
-    int nextOrderId;
+    map<int, MenuItem*> menu;     // Map of menu items with ID as key
+    map<int, Order*> orders;      // Map of orders with order ID as key
+    int nextOrderId;              // ID for the next order
+
 public:
-    // Constructor
+    // Constructor to initialize Restaurant
     Restaurant() : nextOrderId(1) {}
 
     // Destructor to free dynamically allocated memory
@@ -83,10 +91,12 @@ public:
         }
     }
 
+    // Add a MenuItem to the menu
     void addMenuItem(int id, MenuItem* item) {
         menu[id] = item;
     }
 
+    // Display the menu to the user
     void displayMenu() const {
         cout << "\n--- Steakhouse Menu ---" << endl;
         for (const auto& item : menu) {
@@ -95,6 +105,7 @@ public:
         cout << "------------------------\n" << endl;
     }
 
+    // Take a new order from the user
     void takeOrder() {
         int orderId = nextOrderId++;
         Order* order = new Order(orderId);
@@ -132,6 +143,7 @@ public:
         }
     }
 
+    // Display all orders
     void displayOrders() const {
         if (orders.empty()) {
             cout << "\nNo orders have been placed yet.\n" << endl;
