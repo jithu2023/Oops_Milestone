@@ -6,6 +6,7 @@ class MenuItem {
 private:
     string name;
     double price;
+    
 public:
     // Constructor
     MenuItem(string name, double price) : name(name), price(price) {}
