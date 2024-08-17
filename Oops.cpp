@@ -1,9 +1,4 @@
-#include <iostream>
-#include <vector>
-#include <string>
-#include <map>
-#include <limits>
-
+#include <bits/stdc++.h>
 using namespace std;
 
 // Menu Item Class
@@ -182,7 +177,7 @@ int main() {
         cout << "Enter your choice: ";
         cin >> choice;
 
-        // Validate input
+        // Validate inputs
         while (cin.fail() || choice < 1 || choice > 4) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
