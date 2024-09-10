@@ -76,6 +76,8 @@ private:
     map<int, Order*> orders;      // Map of orders with order ID as key
     int nextOrderId;              // ID for the next order
 
+    static int totalOrders;       // Static variable to track total orders across all instances
+
 public:
     // Constructor to initialize Restaurant
     Restaurant() : nextOrderId(1) {}
@@ -89,6 +91,11 @@ public:
         for (auto& order : orders) {
             delete order.second;
         }
+    }
+
+    // Static function to get the total number of orders placed across all restaurants
+    static int getTotalOrders() {
+        return totalOrders;
     }
 
     // Add a MenuItem to the menu
@@ -136,6 +143,7 @@ public:
 
         if (order->getTotal() > 0) {
             orders[orderId] = order;
+            ++totalOrders;  // Increment the static order counter
             cout << "\nOrder placed successfully!\n" << endl;
         } else {
             delete order; // Avoid memory leak by deleting the order if it's empty
@@ -158,6 +166,9 @@ public:
     }
 };
 
+// Initialize the static member variable
+int Restaurant::totalOrders = 0;
+
 int main() {
     Restaurant restaurant;
 
@@ -174,15 +185,16 @@ int main() {
         cout << "1. Display Menu" << endl;
         cout << "2. Take Order" << endl;
         cout << "3. Display Orders" << endl;
-        cout << "4. Exit" << endl;
+        cout << "4. Get Total Orders" << endl;  // New option to get total orders
+        cout << "5. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
         // Validate input
-        while (cin.fail() || choice < 1 || choice > 4) {
+        while (cin.fail() || choice < 1 || choice > 5) {
             cin.clear();
             cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid choice! Please enter a number between 1 and 4: ";
+            cout << "Invalid choice! Please enter a number between 1 and 5: ";
             cin >> choice;
         }
 
@@ -197,6 +209,9 @@ int main() {
                 restaurant.displayOrders();
                 break;
             case 4:
+                cout << "Total orders placed: " << Restaurant::getTotalOrders() << endl;
+                break;
+            case 5:
                 cout << "Exiting the program. Goodbye!" << endl;
                 return 0;
         }
