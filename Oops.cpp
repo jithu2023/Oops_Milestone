@@ -40,7 +40,7 @@ public:
     // Destructor to free dynamically allocated memory
     ~Order() {
         for (auto item : items) {
-            delete item;  // Ensure memory allocated for MenuItem is released
+            delete item;
         }
     }
 
@@ -53,7 +53,7 @@ public:
     double getTotal() const {
         double total = 0.0;
         for (const auto& item : items) {
-            total += item->getPrice();  // Accumulate the price of each item
+            total += item->getPrice();
         }
         return total;
     }
@@ -70,92 +70,80 @@ public:
 };
 
 // Restaurant Class to manage menu items and orders
-// Base class: Restaurant
 class Restaurant {
 private:
-    map<int, MenuItem*> menu;     // Map of menu items with ID as key
-    map<int, Order*> orders;      // Map of orders with order ID as key
-    int nextOrderId;              // ID for the next order
-
-    static int totalOrders;       // Static variable to track total orders across all instances
-protected:
-    vector<MenuItem*> menu;  // Menu items
-    vector<int> orders;      // List of ordered item indices
+    map<int, MenuItem*> menuById;
+    map<string, MenuItem*> menuByName;
+    map<int, Order*> orders;
+    int nextOrderId;
+    static int totalOrders;
 
 public:
-    // Constructor to initialize Restaurant
     Restaurant() : nextOrderId(1) {}
 
-    // Destructor to free dynamically allocated memory
     ~Restaurant() {
-        for (auto& item : menu) {
-            delete item.second;  // Clean up MenuItem pointers
+        for (auto& item : menuById) {
+            delete item.second;
         }
-
         for (auto& order : orders) {
-            delete order.second;  // Clean up Order pointers
+            delete order.second;
         }
     }
 
-    // Add a menu item to the menu
+    // Overloaded function to add menu item by numeric ID
     void addMenuItem(int id, MenuItem* item) {
-        menu[id] = item;  // Store MenuItem in the menu map
+        menuById[id] = item;
     }
 
-    // Static function to get the total number of orders placed across all restaurants
+    // Overloaded function to add menu item by string ID
+    void addMenuItem(string name, MenuItem* item) {
+        menuByName[name] = item;
+    }
+
     static int getTotalOrders() {
-        return totalOrders;  // Return the total orders counter
+        return totalOrders;
     }
 
-    // Display the menu to the user
     void displayMenu() const {
-        cout << "\n--- Restaurant Menu ---" << endl;
-        for (const auto& item : menu) {
+        cout << "\n--- Restaurant Menu by ID ---" << endl;
+        for (const auto& item : menuById) {
             cout << item.first << ". " << item.second->getName() << " - $" << item.second->getPrice() << endl;
         }
-        cout << "------------------------\n" << endl;
+
+        cout << "\n--- Restaurant Menu by Name ---" << endl;
+        for (const auto& item : menuByName) {
+            cout << item.first << ": " << item.second->getName() << " - $" << item.second->getPrice() << endl;
+        }
     }
 
-    // Take a new order from the user
     void takeOrder() {
-        int orderId = nextOrderId++;  // Get a new order ID
-        Order* order = new Order(orderId);  // Create a new Order object
+        int orderId = nextOrderId++;
+        Order* order = new Order(orderId);
         int itemId;
         cout << "\nEnter item IDs to add to order (0 to finish):" << endl;
 
         while (true) {
             cout << "Item ID: ";
             cin >> itemId;
-
-            // Validate input
-            while (cin.fail() || itemId < 0) {
-                cin.clear();
-                cin.ignore(numeric_limits<streamsize>::max(), '\n');
-                cout << "Invalid input. Please enter a valid item ID (0 to finish): ";
-                cin >> itemId;
-            }
-
-            if (itemId == 0) break;  // Exit loop if user finishes
-
-            if (menu.find(itemId) != menu.end()) {
-                order->addItem(menu[itemId]);  // Add item to order if valid
-                cout << menu[itemId]->getName() << " added to the order." << endl;
+            if (itemId == 0) break;
+            if (menuById.find(itemId) != menuById.end()) {
+                order->addItem(menuById[itemId]);
+                cout << menuById[itemId]->getName() << " added to the order." << endl;
             } else {
                 cout << "Invalid item ID! Please try again." << endl;
             }
         }
 
         if (order->getTotal() > 0) {
-            orders[orderId] = order;  // Store the order in the orders map
-            ++totalOrders;  // Increment the static order counter
+            orders[orderId] = order;
+            ++totalOrders;
             cout << "\nOrder placed successfully!\n" << endl;
         } else {
-            delete order; // Avoid memory leak by deleting the order if it's empty
+            delete order;
             cout << "\nNo items were added to the order.\n" << endl;
         }
     }
 
-    // Display all orders
     void displayOrders() const {
         if (orders.empty()) {
             cout << "\nNo orders have been placed yet.\n" << endl;
@@ -164,41 +152,33 @@ public:
 
         cout << "\n--- All Orders ---" << endl;
         for (const auto& order : orders) {
-            order.second->displayOrder();  // Display each order
+            order.second->displayOrder();
             cout << "-----------------------" << endl;
         }
     }
 };
-//frfr
 
-// Initialize the static member variable
 int Restaurant::totalOrders = 0;
 
-// Derived class: Steakhouse inherits from Restaurant
 class Steakhouse : public Restaurant {
 public:
-    // Constructor for Steakhouse
     Steakhouse() {
-        cout << "Welcome to the Steakhouse!" << endl;  // Welcome message
+        cout << "Welcome to the Steakhouse!" << endl;
     }
 
-    // Special function for steak of the day
     void steakOfTheDay() const {
-        cout << "Today's special steak is the Wagyu Ribeye!" << endl;  // Daily special
+        cout << "Today's special steak is the Wagyu Ribeye!" << endl;
     }
 };
 
-// Main function
 int main() {
     Restaurant restaurant;
     Steakhouse steakhouse;
 
-    // Add menu items (steak varieties)
+    // Adding menu items
     restaurant.addMenuItem(1, new MenuItem("Ribeye Steak", 25.99));
     restaurant.addMenuItem(2, new MenuItem("Filet Mignon", 29.99));
-    restaurant.addMenuItem(3, new MenuItem("New York Strip", 22.99));
-    restaurant.addMenuItem(4, new MenuItem("T-Bone Steak", 27.99));
-    restaurant.addMenuItem(5, new MenuItem("Sirloin Steak", 19.99));
+    restaurant.addMenuItem("Special Sirloin", new MenuItem("Sirloin Steak", 19.99));
 
     int choice;
 
@@ -206,44 +186,36 @@ int main() {
         cout << "1. Display Menu" << endl;
         cout << "2. Take Order" << endl;
         cout << "3. Display Orders" << endl;
-        cout << "4. Get Total Orders" << endl;  // New option to get total orders
-        cout << "5. Steak of the Day" << endl;  // New feature for Steakhouse
-        cout << "6. Exit" << endl;  // Corrected option number
+        cout << "4. Get Total Orders" << endl;
+        cout << "5. Steak of the Day" << endl;
+        cout << "6. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
-        // Validate input
-        while (cin.fail() || choice < 1 || choice > 6) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Invalid choice! Please enter a number between 1 and 6: ";
-            cin >> choice;
-        }
-
         switch (choice) {
             case 1:
-                restaurant.displayMenu();  // Display restaurant menu
-                steakhouse.displayMenu();  // Display steakhouse menu
+                restaurant.displayMenu();
+                steakhouse.displayMenu();
                 break;
             case 2:
-                restaurant.takeOrder();  // Take order at restaurant
-                steakhouse.takeOrder();  // Take order at steakhouse
+                restaurant.takeOrder();
+                steakhouse.takeOrder();
                 break;
             case 3:
-                restaurant.displayOrders();  // Display orders from restaurant
-                steakhouse.displayOrders();  // Display orders from steakhouse
+                restaurant.displayOrders();
+                steakhouse.displayOrders();
                 break;
             case 4:
-                cout << "Total orders placed: " << Restaurant::getTotalOrders() << endl;  // Show total orders
+                cout << "Total orders placed: " << Restaurant::getTotalOrders() << endl;
                 break;
             case 5:
-                steakhouse.steakOfTheDay();  // Show today's special from steakhouse
+                steakhouse.steakOfTheDay();
                 break;
             case 6:
-                cout << "Exiting the program. Goodbye!" << endl;  // Exit message
+                cout << "Exiting the program. Goodbye!" << endl;
                 return 0;
             default:
-                cout << "Invalid choice. Please try again." << endl;  // Handle invalid choices
+                cout << "Invalid choice. Please try again." << endl;
         }
     }
 }
