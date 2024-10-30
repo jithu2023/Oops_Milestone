@@ -6,22 +6,26 @@
 
 using namespace std;
 
+// Abstract base class defining the interface for Restaurants
+class RestaurantInterface {
+public:
+    virtual void displaySpecial() const = 0; // Pure virtual function
+    virtual ~RestaurantInterface() = default;
+};
+
 // MenuItem Class to represent an item on the menu
 class MenuItem {
 private:
-    string name;   // Name of the menu item
-    double price;  // Price of the menu item
+    string name;
+    double price;
 
 public:
-    // Constructor to initialize MenuItem with name and price
     MenuItem(string name, double price) : name(name), price(price) {}
 
-    // Getter for item name
     string getName() const {
         return this->name;
     }
 
-    // Getter for item price
     double getPrice() const {
         return this->price;
     }
@@ -30,26 +34,22 @@ public:
 // Order Class to represent a customer order
 class Order {
 private:
-    int orderId;                  // Unique identifier for the order
-    vector<MenuItem*> items;      // List of items in the order
+    int orderId;
+    vector<MenuItem*> items;
 
 public:
-    // Constructor to initialize Order with an ID
     Order(int orderId) : orderId(orderId) {}
 
-    // Destructor to free dynamically allocated memory
     ~Order() {
         for (auto item : items) {
             delete item;
         }
     }
 
-    // Add a MenuItem to the order
     void addItem(MenuItem* item) {
         items.push_back(item);
     }
 
-    // Calculate the total price of the order
     double getTotal() const {
         double total = 0.0;
         for (const auto& item : items) {
@@ -58,7 +58,6 @@ public:
         return total;
     }
 
-    // Display the order details
     void displayOrder() const {
         cout << "Order ID: " << this->orderId << endl;
         cout << "Items:" << endl;
@@ -69,8 +68,8 @@ public:
     }
 };
 
-// Restaurant Class to manage menu items and orders
-class Restaurant {
+// Restaurant Class inheriting from RestaurantInterface
+class Restaurant : public RestaurantInterface {
 private:
     map<int, MenuItem*> menuById;
     map<string, MenuItem*> menuByName;
@@ -90,12 +89,10 @@ public:
         }
     }
 
-    // Overloaded function to add menu item by numeric ID
     void addMenuItem(int id, MenuItem* item) {
         menuById[id] = item;
     }
 
-    // Overloaded function to add menu item by string ID
     void addMenuItem(string name, MenuItem* item) {
         menuByName[name] = item;
     }
@@ -156,10 +153,16 @@ public:
             cout << "-----------------------" << endl;
         }
     }
+
+    // Implementation of the pure virtual function
+    void displaySpecial() const override {
+        cout << "Today's special is Chef's Surprise!" << endl;
+    }
 };
 
 int Restaurant::totalOrders = 0;
 
+// Steakhouse Class inheriting from Restaurant and implementing displaySpecial
 class Steakhouse : public Restaurant {
 public:
     Steakhouse() {
@@ -168,6 +171,10 @@ public:
 
     void steakOfTheDay() const {
         cout << "Today's special steak is the Wagyu Ribeye!" << endl;
+    }
+
+    void displaySpecial() const override {
+        cout << "Today's special at Steakhouse is Wagyu Ribeye!" << endl;
     }
 };
 
@@ -188,7 +195,8 @@ int main() {
         cout << "3. Display Orders" << endl;
         cout << "4. Get Total Orders" << endl;
         cout << "5. Steak of the Day" << endl;
-        cout << "6. Exit" << endl;
+        cout << "6. Display Special" << endl;
+        cout << "7. Exit" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -212,6 +220,9 @@ int main() {
                 steakhouse.steakOfTheDay();
                 break;
             case 6:
+                steakhouse.displaySpecial();
+                break;
+            case 7:
                 cout << "Exiting the program. Goodbye!" << endl;
                 return 0;
             default:
